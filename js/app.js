@@ -89,13 +89,14 @@ function handleLoginPage() {
                 reader.onload = function(event) {
                     // Save Name + Photo
                     saveUserData(partnerName, event.target.result);
-                    window.location.href = 'valentine-week/pages/dashboard.html';
-                };
+// NEW (FIXED)
+                    window.location.href = './pages/dashboard.html';                                };
                 reader.readAsDataURL(photoInput.files[0]);
             } else {
                 // Save Name Only
                 saveUserData(partnerName, null);
-                window.location.href = 'valentine-week/pages/dashboard.html';
+                // NEW (FIXED)
+                    window.location.href = './pages/dashboard.html';    
             }
         });
     }
