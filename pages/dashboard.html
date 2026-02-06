@@ -510,29 +510,49 @@
             vis.classList.remove('paused');
         });
 
-        // 6. DATE LOCKING
-     const todayStr = new Date().toISOString().split('T')[0];
-        const locks = [
-            {id:'sec-rose', date:'2026-02-06'}, {id:'sec-propose', date:'2026-02-07'},
-            {id:'sec-choco', date:'2026-02-08'}, {id:'sec-teddy', date:'2026-02-09'},
-            {id:'sec-promise', date:'2026-02-10'}, {id:'sec-hug', date:'2026-02-11'},
-            {id:'sec-kiss', date:'2026-02-12'}, {id:'sec-val', date:'2026-02-13'}
-        ];
-        locks.forEach(l => {
-            if(todayStr < l.date) {
-                const el = document.getElementById(l.id);
-                if(el) {
-                    el.classList.add('locked-section');
-                    // Change button text
-                    const btn = el.querySelector('.magic-btn');
-                    if(btn) {
-                        btn.innerText = "Locked";
-                        btn.href = "javascript:void(0)";
-                    }
-                }
-            }
-        });
+        // 6. DATE LOCKING (Optimized for GitHub & Local Time)
+const today = new Date();
+const todayStr = today.getFullYear() + '-' + 
+                 String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                 String(today.getDate()).padStart(2, '0');
 
+const locks = [
+    {id:'sec-rose', date:'2026-02-07', file:'rose_day.html'},
+    {id:'sec-propose', date:'2026-02-08', file:'propose_day.html'},
+    {id:'sec-choco', date:'2026-02-09', file:'chocolate_day.html'},
+    {id:'sec-teddy', date:'2026-02-10', file:'teddy_day.html'},
+    {id:'sec-promise', date:'2026-02-11', file:'promise_day.html'},
+    {id:'sec-hug', date:'2026-02-12', file:'hug_day.html'},
+    {id:'sec-kiss', date:'2026-02-13', file:'kiss_day.html'},
+    {id:'sec-val', date:'2026-02-14', file:'valentine.html'}
+];
+
+locks.forEach(l => {
+    const el = document.getElementById(l.id);
+    if (!el) return;
+
+    const btn = el.querySelector('.magic-btn');
+    
+    if (todayStr < l.date) {
+        // --- LOCKED ---
+        el.classList.add('locked-section');
+        el.style.filter = "grayscale(1)";
+        if (btn) {
+            btn.innerText = "Locked";
+            // Uses lowercase 'pages' and relative path
+            btn.href = "coming_soon.html"; 
+        }
+    } else {
+        // --- UNLOCKED (Feb 6 & 7 should be open now) ---
+        el.classList.remove('locked-section');
+        el.style.filter = "none";
+        el.style.opacity = "1";
+        if (btn) {
+            btn.href = l.file; // Link directly to the file in the same folder
+            btn.innerText = "Open " + l.id.replace('sec-', '').charAt(0).toUpperCase() + l.id.replace('sec-', '').slice(1);
+        }
+    }
+});
         // 7. SEND LOVE BUTTON
         const sendBtn = document.getElementById('send-love-trigger');
         if(sendBtn) {
