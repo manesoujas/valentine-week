@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Real Rose</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #050202;
+            --rose-inner: #8a0000;
+            --rose-outer: #d00000;
+            --rose-tip: #ff3333;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle, #220000 0%, #000000 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-family: 'Cinzel', serif;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* NAVIGATION */
+        .back-btn {
+            position: absolute; top: 30px; left: 30px;
+            color: rgba(255,255,255,0.4); text-decoration: none;
+            letter-spacing: 2px; font-size: 0.8rem; z-index: 100;
+            transition: 0.3s;
+        }
+        .back-btn:hover { color: white; }
+
+        /* HEADER */
+        .header {
+            position: absolute; top: 10%; width: 100%; text-align: center;
+            pointer-events: none; transition: opacity 1s; z-index: 20;
+        }
+        .title {
+            font-family: 'Great Vibes', cursive; font-size: 4.5rem; color: #ff0a54;
+            text-shadow: 0 0 40px rgba(255, 0, 50, 0.5);
+        }
+        .subtitle { color: #aaa; letter-spacing: 3px; font-size: 0.8rem; margin-top: 5px; }
+
+        /* ============================
+           3D ROSE ENGINE
+           ============================ */
+        .rose-wrapper {
+            position: relative;
+            width: 100px; height: 100px;
+            transform-style: preserve-3d;
+            transform: rotateX(60deg) rotateZ(0deg); /* Angled view so it doesn't look flat */
+            transition: transform 1s;
+            cursor: pointer;
+            margin-top: 100px;
+            z-index: 10;
+        }
+        
+        .rose-wrapper:hover {
+            transform: rotateX(50deg) rotateZ(20deg) scale(1.1);
+        }
+
+        /* THE PETAL */
+        .petal {
+            position: absolute; left: 0; top: 0;
+            width: 100px; height: 120px;
+            /* Velvet Gradient */
+            background: radial-gradient(circle at 50% 10%, var(--rose-tip), var(--rose-outer), var(--rose-inner));
+            border-radius: 50% 50% 0 0;
+            /* Inner shadow for curvature depth */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 10px rgba(0,0,0,0.3);
+            transform-origin: bottom center;
+            transition: all 2.5s cubic-bezier(0.19, 1, 0.22, 1);
+            opacity: 0.95;
+        }
+
+        /* STEM */
+        .stem {
+            position: absolute; top: 100%; left: 50%;
+            width: 8px; height: 300px;
+            background: linear-gradient(90deg, #1b4332, #40916c, #1b4332);
+            transform: translateX(-50%) rotateX(-90deg); /* Stick down */
+            border-radius: 5px;
+            z-index: -1;
+        }
+        
+        /* THORNS */
+        .thorn {
+            position: absolute; background: #1b4332;
+            width: 0; height: 0; border-left: 5px solid transparent; 
+            border-right: 5px solid transparent; border-bottom: 15px solid #1b4332;
+        }
+        .t1 { top: 50px; left: -5px; transform: rotate(-45deg); }
+        .t2 { top: 120px; right: -5px; transform: rotate(45deg); }
+
+        /* ============================
+           MESSAGE CARD
+           ============================ */
+        .card-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            z-index: 50; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 1s;
+        }
+        .card-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .card-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 40px; border-radius: 20px; text-align: center;
+            box-shadow: 0 0 50px rgba(255, 0, 50, 0.2);
+            transform: translateY(50px); transition: 1s; max-width: 400px; width: 90%;
+        }
+        .card-overlay.show .card-box { transform: translateY(0); }
+
+        .card-text {
+            color: #fff; font-size: 1.2rem; font-style: italic; line-height: 1.6;
+        }
+        .reset-btn {
+            margin-top: 20px; background: transparent; border: 1px solid #ff0a54;
+            color: #ff0a54; padding: 10px 25px; border-radius: 30px; cursor: pointer;
+            transition: 0.3s;
+        }
+        .reset-btn:hover { background: #ff0a54; color: white; }
+
+    </style>
+</head>
+<body>
+
+    <a href="dashboard.html" class="back-btn">← Timeline</a>
+
+    <div class="header" id="header">
+        <h1 class="title">Happy Rose Day</h1>
+        <p class="subtitle">TAP THE ROSE</p>
+    </div>
+
+    <div class="rose-wrapper" id="rose">
+        <div class="stem">
+            <div class="thorn t1"></div>
+            <div class="thorn t2"></div>
+        </div>
+        </div>
+
+    <div class="card-overlay" id="overlay">
+        <div class="card-box">
+            <h2 style="font-family:'Great Vibes'; color:#ff0a54; font-size:3rem;">For <span class="dynamic-name">Love</span></h2>
+            <p class="card-text">
+                "Like a rose needs rain, I need you. You make my life bloom."
+            </p>
+            <button class="reset-btn" onclick="location.reload()">Replay</button>
+        </div>
+    </div>
+
+    <script type="module" src="../js/app.js"></script>
+    
+    <script>
+        // 1. GENERATE ROSE PETALS (Nature's Math)
+        const rose = document.getElementById('rose');
+        const numPetals = 40; 
+        const goldenAngle = 137.5; // The Golden Ratio for plants
+        const petals = [];
+
+        for (let i = 0; i < numPetals; i++) {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            
+            // MATH TO CREATE SPIRAL
+            const angle = i * goldenAngle;
+            
+            // Initial position: Tightly wound spiral
+            // translateZ pushes them outwards from center
+            // rotateX stands them up
+            const initialTransform = `rotateY(${angle}deg) translateZ(${i * 1.5}px) rotateX(75deg)`;
+            
+            petal.style.transform = initialTransform;
+            
+            // Size variation: Outer petals are bigger
+            const size = 60 + (i * 1.5); 
+            petal.style.width = `${size}px`;
+            petal.style.height = `${size + 20}px`;
+            petal.style.left = `calc(50% - ${size/2}px)`;
+            petal.style.top = `calc(50% - ${size + 20}px)`;
+
+            rose.appendChild(petal);
+            petals.push({ el: petal, index: i, angle: angle });
+        }
+
+        // 2. BLOOM LOGIC
+        let isOpen = false;
+        rose.addEventListener('click', () => {
+            if(isOpen) return;
+            isOpen = true;
+
+            // Animate each petal opening
+            petals.forEach(p => {
+                // Calculate how much it opens
+                // Inner petals (low index) stay tight (~60deg)
+                // Outer petals (high index) fall flat (~10deg)
+                const openX = 60 - (p.index * 1.5); 
+                const clampedX = Math.max(10, openX); 
+                
+                // Unfurl outward
+                const bloomTransform = `rotateY(${p.angle}deg) translateZ(${p.index * 4 + 20}px) rotateX(${clampedX}deg)`;
+                
+                p.el.style.transform = bloomTransform;
+            });
+
+            // Adjust Camera Angle for better view
+            rose.style.transform = "rotateX(30deg) translateY(-50px) scale(0.8)";
+
+            // Fade Header
+            document.getElementById('header').style.opacity = '0';
+            
+            // Show Card after delay
+            setTimeout(() => {
+                document.getElementById('overlay').classList.add('show');
+            }, 1000);
+
+            // Confetti Explosion
+            confetti({
+                particleCount: 150,
+                spread: 120,
+                origin: { y: 0.6 },
+                colors: ['#d00000', '#ff0a54'],
+                scalar: 0.8
+            });
+        });
+    </script>
+</body>
+</html>

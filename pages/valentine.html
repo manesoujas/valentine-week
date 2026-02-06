@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Brewing Love</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            /* THEME: Pink Potion */
+            --bg: #ffeef2;
+            --liquid-light: #ff5c8d;
+            --liquid-dark: #ff005c;
+            --glass-shine: rgba(255, 255, 255, 0.6);
+            --cork: #e09f3e;
+            
+            /* RESPONSIVE SIZE */
+            --flask-width: 35vmin;
+            --flask-height: 45vmin;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: radial-gradient(circle at center, #fff0f5 0%, #ffc2d1 100%);
+            height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            position: absolute; top: 10%; text-align: center;
+            color: var(--liquid-dark);
+            z-index: 10;
+        }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 8vmin; margin-bottom: 5px; }
+        .header p { letter-spacing: 2px; font-size: 3vmin; opacity: 0.7; text-transform: uppercase; }
+
+        /* --- THE POTION BOTTLE --- */
+        .bottle-container {
+            position: relative;
+            width: var(--flask-width); height: var(--flask-height);
+            margin-top: 5vmin;
+            cursor: pointer;
+            filter: drop-shadow(0 20px 30px rgba(255, 0, 92, 0.2));
+            transition: transform 0.2s;
+        }
+        .bottle-container:active { transform: scale(0.95); }
+
+        /* Glass Shape (Round Bottom Flask) */
+        .glass {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: var(--flask-width); height: var(--flask-width);
+            background: rgba(255,255,255,0.2);
+            border: 4px solid white; border-radius: 50%;
+            overflow: hidden;
+            z-index: 2;
+            box-shadow: inset 10px 10px 20px rgba(255,255,255,0.5), inset -10px -10px 20px rgba(0,0,0,0.05);
+        }
+        
+        /* The Neck */
+        .neck {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: calc(var(--flask-width) / 2.5); height: calc(var(--flask-height) - var(--flask-width) + 10px);
+            background: rgba(255,255,255,0.2);
+            border: 4px solid white; border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            z-index: 1;
+        }
+        
+        /* The Cork */
+        .cork {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: calc(var(--flask-width) / 2.8); height: 25px;
+            background: var(--cork); border-radius: 5px;
+            border-bottom: 3px solid rgba(0,0,0,0.1);
+            z-index: 0;
+            transition: transform 0.1s;
+        }
+
+        /* LIQUID ANIMATION */
+        .liquid {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 70%;
+            background: linear-gradient(to bottom, var(--liquid-light), var(--liquid-dark));
+            border-radius: 50%;
+            transform-origin: bottom center;
+            animation: breatheLiquid 4s ease-in-out infinite;
+        }
+        /* Wave Surface */
+        .liquid::before {
+            content: ''; position: absolute; top: -10px; left: -50%; width: 200%; height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            animation: wave 3s linear infinite;
+        }
+        @keyframes wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes breatheLiquid { 0%, 100% { height: 65%; } 50% { height: 70%; } }
+
+        /* BUBBLES */
+        .bubble {
+            position: absolute; bottom: 0; left: 50%;
+            width: 10px; height: 10px; background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            animation: rise 4s infinite ease-in;
+            opacity: 0;
+        }
+        @keyframes rise {
+            0% { bottom: 20px; opacity: 0; transform: translateX(0); }
+            50% { opacity: 1; }
+            100% { bottom: 100%; opacity: 0; transform: translateX(20px); }
+        }
+
+        /* --- LABEL --- */
+        .label {
+            position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%) rotate(-5deg);
+            background: #fff; padding: 10px 20px;
+            border: 2px solid var(--cork); border-radius: 5px;
+            text-align: center; z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-family: 'Fredoka', sans-serif;
+        }
+        .label span { display: block; font-size: 0.7rem; color: #888; margin-top: 2px; }
+        .label strong { color: var(--liquid-dark); font-size: 1.2rem; }
+
+        /* --- ANIMATIONS (Interaction) --- */
+        .shake { animation: shakeBottle 0.5s ease-in-out; }
+        @keyframes shakeBottle {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .pop-cork { animation: popCork 0.4s ease-out; }
+        @keyframes popCork {
+            0% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-20px); }
+            100% { transform: translateX(-50%) translateY(0); }
+        }
+
+        /* --- BOTTOM UI --- */
+        .ui-container {
+            position: absolute; bottom: 8%; width: 100%; text-align: center;
+        }
+        .status-pill {
+            display: inline-block; background: white; padding: 10px 25px;
+            border-radius: 50px; color: var(--liquid-dark); font-weight: bold;
+            box-shadow: 0 5px 20px rgba(255, 0, 92, 0.15);
+            margin-bottom: 20px; opacity: 0; transform: translateY(10px);
+            transition: 0.3s;
+        }
+        .status-pill.show { opacity: 1; transform: translateY(0); }
+
+        .back-link {
+            display: inline-block; color: var(--liquid-dark); text-decoration: none;
+            border: 2px solid var(--liquid-dark); padding: 10px 30px; border-radius: 50px;
+            font-weight: bold; transition: 0.3s;
+        }
+        .back-link:hover { background: var(--liquid-dark); color: white; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Love Potion</h1>
+        <p>BREWING IN PROGRESS...</p>
+    </div>
+
+    <div class="bottle-container" id="bottle">
+        <div class="cork" id="cork"></div>
+        
+        <div class="neck"></div>
+        
+        <div class="glass">
+            <div class="liquid"></div>
+            <div id="bubble-layer"></div>
+        </div>
+
+        <div class="label">
+            <strong>Opening Soon</strong>
+            <span>DO NOT OPEN RIGHT NOW !</span>
+        </div>
+    </div>
+
+    <div class="ui-container">
+        <div class="status-pill" id="status">Still Brewing! Wait! 🧪</div>
+        <br>
+        <a href="dashboard.html" class="back-link">Return to Timeline</a>
+    </div>
+
+    <script>
+        const bottle = document.getElementById('bottle');
+        const cork = document.getElementById('cork');
+        const status = document.getElementById('status');
+        const bubbleLayer = document.getElementById('bubble-layer');
+
+        // 1. GENERATE BUBBLES
+        function createBubble() {
+            const b = document.createElement('div');
+            b.classList.add('bubble');
+            b.style.left = Math.random() * 80 + 10 + '%';
+            b.style.animationDuration = Math.random() * 2 + 2 + 's';
+            b.style.width = Math.random() * 10 + 5 + 'px';
+            b.style.height = b.style.width;
+            bubbleLayer.appendChild(b);
+            
+            // Cleanup
+            setTimeout(() => b.remove(), 4000);
+        }
+        setInterval(createBubble, 500);
+
+        // 2. INTERACTION
+        const msgs = [
+            "Still Brewing! 🧪",
+            "Ingredients Mixing... 🥣",
+            "Not Potent Yet! ⚡",
+            "Wait for the Date! 📅",
+            "Magic takes time! ✨"
+        ];
+
+        bottle.addEventListener('click', () => {
+            // A. Shake Bottle
+            bottle.classList.remove('shake');
+            void bottle.offsetWidth;
+            bottle.classList.add('shake');
+
+            // B. Pop Cork Animation
+            cork.classList.remove('pop-cork');
+            void cork.offsetWidth;
+            cork.classList.add('pop-cork');
+
+            // C. Show Status
+            status.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+            status.classList.add('show');
+
+            // D. Bubble Explosion (Confetti)
+            confetti({
+                particleCount: 40,
+                spread: 50,
+                origin: { y: 0.6 },
+                colors: ['#ff5c8d', '#ffffff'],
+                shapes: ['circle'],
+                gravity: 0.5,
+                scalar: 0.8
+            });
+
+            // Reset UI
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 1500);
+        });
+
+    </script>
+</body>
+</html>

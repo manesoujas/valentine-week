@@ -1,0 +1,74 @@
+/* GRID.CSS
+   Controls the main layout structure and responsive grids.
+*/
+
+/* 1. The Main App Container */
+/* Keeps everything centered and prevents it from getting too wide on huge screens */
+.app-container {
+    width: 100%;
+    max-width: 1000px; /* Maximum width of the content area */
+    margin: 0 auto;    /* Centers the container */
+    padding: 20px;     /* Breathing room on the sides */
+    position: relative;
+    z-index: 2;        /* Sits above the background layer */
+    min-height: 100vh; /* Takes up full height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center content */
+}
+
+/* On mobile, align to top slightly more */
+@media (max-width: 768px) {
+    .app-container {
+        justify-content: flex-start;
+        padding-top: 40px;
+    }
+}
+
+/* 2. The Dashboard Days Grid */
+/* Automatically fits as many cards as possible in a row */
+.days-grid {
+    display: grid;
+    /* This magic line makes it responsive without media queries: */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 20px; /* Space between cards */
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* 3. Special "Highlight" Card (Valentine's Day) */
+/* Makes the 14th card span full width on mobile for emphasis */
+.day-card.highlight-card {
+    grid-column: 1 / -1; /* Spans all available columns */
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,230,230,0.9));
+    border: 2px solid var(--primary, #ff4d6d);
+}
+
+.day-card.highlight-card h3 {
+    color: var(--primary, #ff4d6d);
+    font-size: 1.3rem;
+}
+
+/* 4. Section Spacing */
+section {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+/* 5. Flex Utilities (Helpers for alignment) */
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}

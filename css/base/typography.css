@@ -1,0 +1,61 @@
+/* TYPOGRAPHY.CSS
+   Sets font families, sizes, and weights.
+*/
+
+/* 1. Font Definitions */
+:root {
+    --font-main: 'Poppins', sans-serif;
+    --font-romantic: 'Dancing Script', cursive; /* For Rose/Kiss Day */
+    --font-royal: 'Cinzel', serif;             /* For Propose Day */
+    --font-cute: 'Fredoka One', cursive;       /* For Teddy Day */
+    --font-fancy: 'Great Vibes', cursive;      /* For Valentine Day */
+}
+
+/* 2. Global Defaults */
+body {
+    font-family: var(--font-main);
+    font-size: 16px;
+    color: var(--text-color, #444); /* Fallback color */
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 3. Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+/* 4. Utility Classes (Used in your HTML) */
+
+/* The small text under the big headers */
+.subtitle {
+    font-size: 0.95rem;
+    color: #666;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+}
+
+/* Fancy romantic text */
+.text-romantic {
+    font-family: var(--font-romantic);
+}
+
+/* 5. Mobile Adjustments */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    body { font-size: 15px; }
+}

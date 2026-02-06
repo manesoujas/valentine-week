@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sealed with a Kiss</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #1a0b0b;
+            --paper: #f4e4bc;
+            --gold: #d4af37;
+            --wax: #c9184a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            /* Elegant Grain Texture */
+            background-image: url("https://www.transparenttextures.com/patterns/black-paper.png");
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-family: 'Cinzel', serif;
+            color: var(--paper);
+            overflow: hidden;
+        }
+
+        /* SPOTLIGHT */
+        .spotlight {
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* TEXT */
+        .title {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 4rem; color: var(--gold);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .subtitle {
+            font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase;
+            color: rgba(255,255,255,0.5); margin-bottom: 50px;
+        }
+
+        /* ============================
+           THE ENVELOPE CSS
+           ============================ */
+        .envelope-wrapper {
+            position: relative;
+            width: 300px; height: 200px;
+            cursor: pointer;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .envelope {
+            position: relative;
+            width: 100%; height: 100%;
+            background: var(--paper);
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        /* The Flaps */
+        .flap {
+            position: absolute; width: 100%; height: 100%;
+            z-index: 2;
+        }
+        .flap.left {
+            border-style: solid;
+            border-width: 100px 0 100px 150px;
+            border-color: transparent transparent transparent #e6d2a0;
+            top: 0; left: 0;
+        }
+        .flap.right {
+            border-style: solid;
+            border-width: 100px 150px 100px 0;
+            border-color: transparent #e6d2a0 transparent transparent;
+            top: 0; right: 0;
+        }
+        .flap.bottom {
+            border-style: solid;
+            border-width: 0 150px 110px 150px;
+            border-color: transparent transparent #dcc289 transparent;
+            bottom: 0; left: 0; z-index: 3;
+        }
+        .flap.top {
+            border-style: solid;
+            border-width: 110px 150px 0 150px;
+            border-color: #f4e4bc transparent transparent transparent;
+            top: 0; left: 0; z-index: 4;
+            transform-origin: top;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        /* THE WAX SEAL */
+        .wax-seal {
+            position: absolute; top: 90px; left: 50%;
+            transform: translateX(-50%);
+            width: 50px; height: 50px;
+            background: radial-gradient(circle at 30% 30%, #ff4d6d, #c9184a);
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 0 10px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+        .wax-seal i { color: rgba(50, 0, 0, 0.3); font-size: 1.2rem; }
+        
+        /* GLOW ON HOVER */
+        .envelope-wrapper:hover .wax-seal { transform: translateX(-50%) scale(1.1); box-shadow: 0 0 20px var(--wax); }
+
+        /* SHAKE ANIMATION */
+        .shake { animation: shakeEnvelope 0.5s; }
+        @keyframes shakeEnvelope {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px) rotate(-5deg); }
+            75% { transform: translateX(10px) rotate(5deg); }
+            100% { transform: translateX(0); }
+        }
+
+        /* WARNING NOTIFICATION */
+        .toast {
+            position: absolute; bottom: 20%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 15px 30px; border-radius: 5px;
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px;
+            opacity: 0; transform: translateY(20px);
+            transition: 0.5s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        /* BUTTON */
+        .back-btn {
+            position: absolute; bottom: 50px;
+            color: #666; text-decoration: none;
+            font-size: 0.8rem; transition: 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+        .back-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+    </style>
+</head>
+<body>
+
+    <div class="spotlight"></div>
+
+    <div class="title">For Your Eyes Only</div>
+    <div class="subtitle">Confidential Correspondence</div>
+
+    <div class="envelope-wrapper" id="letter">
+        <div class="envelope">
+            <div class="flap left"></div>
+            <div class="flap right"></div>
+            <div class="flap bottom"></div>
+            <div class="flap top"></div>
+            
+            <div class="wax-seal">
+                <i class="fas fa-heart"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">The seal is not ready to break.</div>
+
+    <a href="dashboard.html" class="back-btn">Return to Timeline</a>
+
+    <script>
+        const letter = document.getElementById('letter');
+        const toast = document.getElementById('toast');
+        const seal = document.querySelector('.wax-seal');
+
+        const phrases = [
+            "The seal is not ready.",
+            "Patience is a virtue.",
+            "Do not break the promise.",
+            "Wait for the date.",
+            "It's worth the wait."
+        ];
+
+        letter.addEventListener('click', () => {
+            // 1. Shake Effect
+            letter.classList.remove('shake');
+            void letter.offsetWidth; // trigger reflow
+            letter.classList.add('shake');
+
+            // 2. Show Toast Message
+            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            toast.innerText = randomPhrase;
+            toast.classList.add('show');
+
+            // 3. Pulse the Seal color
+            seal.style.background = "#ff0000";
+            setTimeout(() => {
+                seal.style.background = "radial-gradient(circle at 30% 30%, #ff4d6d, #c9184a)";
+            }, 300);
+
+            // 4. Hide toast after delay
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+
+            // 5. Gold Dust Confetti (Elegant)
+            confetti({
+                particleCount: 40,
+                spread: 60,
+                origin: { y: 0.5 },
+                colors: ['#d4af37', '#f4e4bc'],
+                ticks: 100,
+                gravity: 0.8,
+                scalar: 0.6,
+                shapes: ['circle']
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+/* THEME: NEON LOVE
+   A dark, glowing theme for a modern romantic vibe.
+*/
+
+[data-theme="neon-love"] {
+    /* 1. Color Palette */
+    --primary: #ff0055;      /* Neon Pink */
+    --secondary: #00e5ff;    /* Neon Cyan */
+    --text-color: #ffffff;   /* White text for dark bg */
+    --bg-gradient-1: #0f0c29; /* Deep Purple/Black */
+    --bg-gradient-2: #302b63;
+    --bg-gradient-3: #24243e;
+
+    /* 2. Global Background */
+    /* Overrides the default animated spheres with a dark mesh */
+    --body-bg: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+}
+
+/* APPLYING THE THEME OVERRIDES */
+
+body[data-theme="neon-love"] {
+    background: var(--body-bg);
+    color: var(--text-color);
+}
+
+/* Adjust the Background Spheres to be "Glows" instead of solid shapes */
+body[data-theme="neon-love"] #background-layer .gradient-sphere {
+    opacity: 0.4;
+    filter: blur(80px);
+    background: radial-gradient(circle, var(--primary), transparent 70%);
+}
+
+/* Adjust Glass Cards for Dark Mode */
+body[data-theme="neon-love"] .glass-card,
+body[data-theme="neon-love"] .header-content {
+    background: rgba(255, 255, 255, 0.1); /* Very transparent white */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2); /* Pink Glow */
+}
+
+body[data-theme="neon-love"] .day-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+body[data-theme="neon-love"] .day-card:hover {
+    background: rgba(255, 0, 85, 0.2);
+    border-color: var(--primary);
+    box-shadow: 0 0 30px var(--primary);
+}
+
+/* Adjust Inputs for Dark Mode */
+body[data-theme="neon-love"] input[type="text"],
+body[data-theme="neon-love"] input[type="password"] {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: #555;
+    color: white;
+}
+
+body[data-theme="neon-love"] input:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 10px var(--secondary);
+}
+
+/* Adjust Text Colors */
+body[data-theme="neon-love"] .subtitle {
+    color: #ccc;
+}
+
+body[data-theme="neon-love"] h1,
+body[data-theme="neon-love"] h2,
+body[data-theme="neon-love"] h3 {
+    text-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+}

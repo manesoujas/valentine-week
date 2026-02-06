@@ -1,0 +1,43 @@
+/* RESET.CSS
+    Removes browser default styles for consistency.
+*/
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+}
+
+/* Remove list styles (bullets) */
+ul, ol {
+    list-style: none;
+}
+
+/* Remove anchor underlines by default */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Remove blue highlight on mobile tap */
+button, a {
+    -webkit-tap-highlight-color: transparent;
+}

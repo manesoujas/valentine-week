@@ -1,0 +1,88 @@
+/* =========================================
+   MAIN.CSS - The Master Stylesheet
+   ========================================= */
+
+/* 1. Base Styles (Resets & Fonts) */
+@import 'base/reset.css';
+@import 'base/typography.css';
+
+/* 2. Layout Systems (Grid & Nav) */
+@import 'layout/grid.css';
+@import 'layout/navigation.css';
+
+/* 3. Components (Buttons, Cards, Inputs) */
+@import 'components/buttons.css';
+@import 'components/cards.css';
+@import 'components/forms.css';
+@import 'components/modals.css';
+
+/* 4. Themes (Colors) */
+@import 'themes/passion-red.css';
+@import 'themes/neon-love.css';
+
+/* =========================================
+   GLOBAL BACKGROUND ANIMATION
+   (The floating blobs behind the glass cards)
+   ========================================= */
+
+body {
+    background-color: var(--accent, #fff0f3);
+    min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal scrollbars */
+    position: relative;
+    transition: background-color 0.5s ease;
+}
+
+#background-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Behind everything else */
+    overflow: hidden;
+    pointer-events: none; /* Let clicks pass through */
+}
+
+.gradient-sphere {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px); /* This makes them soft and dreamy */
+    opacity: 0.6;
+    animation: floatSphere 20s infinite alternate ease-in-out;
+}
+
+/* Sphere 1 (Top Left) */
+.gradient-sphere.one {
+    width: 500px;
+    height: 500px;
+    top: -100px;
+    left: -100px;
+    background: radial-gradient(circle, #ffb3c1, transparent 70%);
+}
+
+/* Sphere 2 (Bottom Right) */
+.gradient-sphere.two {
+    width: 400px;
+    height: 400px;
+    bottom: -50px;
+    right: -50px;
+    background: radial-gradient(circle, #ff8fa3, transparent 70%);
+    animation-delay: -10s; /* Start halfway through cycle */
+}
+
+/* Floating Animation Keyframes */
+@keyframes floatSphere {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(50px, 100px) scale(1.1);
+    }
+    66% {
+        transform: translate(-30px, 50px) scale(0.9);
+    }
+    100% {
+        transform: translate(20px, -20px) scale(1);
+    }
+}

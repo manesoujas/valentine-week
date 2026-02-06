@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Lost in Love?</title>
+    
+    <link rel="stylesheet" href="assets/css/main.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Specific Styles for 404 Animation */
+        .broken-heart-icon {
+            font-size: 80px;
+            color: var(--primary, #ff4d6d);
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: heartbreak 2s infinite;
+        }
+
+        @keyframes heartbreak {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9) rotate(-5deg); opacity: 0.7; }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body data-theme="passion-red">
+
+    <div id="background-layer">
+        <div class="gradient-sphere one"></div>
+        <div class="gradient-sphere two"></div>
+    </div>
+
+    <main class="app-container">
+        <section class="glass-card" style="text-align: center; padding: 60px 30px;">
+            
+            <div class="broken-heart-icon">
+                <i class="fas fa-heart-broken"></i>
+            </div>
+
+            <h1>Oops! Heartbreak?</h1>
+            <p class="subtitle" style="margin-top: 10px;">
+                We couldn't find the page you were looking for.<br>
+                It might have ghosted us. 👻
+            </p>
+
+            <div style="margin-top: 30px;">
+                <a href="index.html" class="btn-primary ripple-effect" style="text-decoration: none; display: inline-block;">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
+
+        </section>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+/* CARDS.CSS
+   Styles for containers, glassmorphism, and dashboard grid items.
+*/
+
+/* 1. The Main "Frosted Glass" Container */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+    backdrop-filter: blur(12px);         /* The Blur Effect */
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 480px; /* Standard width for mobile/desktop balance */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 
+                0 5px 15px rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+/* 2. Dashboard Day Cards (The Grid Items) */
+.day-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--text-color, #444);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    border: 2px solid transparent;
+}
+
+/* Hover State for Day Cards */
+.day-card:hover {
+    transform: translateY(-8px);
+    background: white;
+    box-shadow: 0 15px 30px rgba(255, 77, 109, 0.15); /* Soft pink glow */
+    border-color: rgba(255, 77, 109, 0.3);
+}
+
+/* 3. Card Internals */
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    transition: transform 0.3s;
+}
+
+.day-card:hover .card-icon {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.card-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+    font-weight: 600;
+}
+
+.card-info p {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* 4. Locked State (Grayed out) */
+.day-card.locked {
+    background: rgba(255, 255, 255, 0.4);
+    filter: grayscale(1);
+    opacity: 0.8;
+    cursor: default;
+}
+
+.day-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: transparent;
+}
+
+.day-card.locked .card-icon {
+    opacity: 0.5;
+}
+
+/* 5. Status Badge (Open/Locked pill) */
+.status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #e0e0e0;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 6. Animations */
+.entrance-animation {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

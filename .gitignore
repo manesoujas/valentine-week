@@ -1,0 +1,17 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Editor Directories (Optional but recommended)
+.vscode/
+.idea/
+
+# Node Modules (In case you add npm later)
+node_modules/
+
+# Local Environment Variables (If you add them later)
+.env

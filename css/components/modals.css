@@ -1,0 +1,96 @@
+/* MODALS.CSS
+   Styles for popup windows and overlays.
+*/
+
+/* 1. The Dark Overlay (Background Dimmer) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Dark semi-transparent */
+    backdrop-filter: blur(4px);    /* Blurs the website behind it */
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* 2. The Modal Box (Glass Effect) */
+.modal {
+    background: rgba(255, 255, 255, 0.95);
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center;
+    position: relative;
+    border: 1px solid white;
+}
+
+/* 3. Open State (Applied via JS) */
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay.active .modal {
+    transform: scale(1);
+}
+
+/* 4. Modal Content */
+.modal-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: inline-block;
+    animation: bounceModal 2s infinite;
+}
+
+@keyframes bounceModal {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.modal h3 {
+    color: var(--primary, #ff4d6d);
+    margin-bottom: 10px;
+}
+
+.modal p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+/* 5. Close Button (Top Right X) */
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--primary, #ff4d6d);
+}
+
+/* 6. Action Buttons Area */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

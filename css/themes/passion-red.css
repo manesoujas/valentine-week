@@ -1,0 +1,57 @@
+/* THEME: PASSION RED (Default)
+   A warm, romantic light theme.
+*/
+
+[data-theme="passion-red"] {
+    /* 1. Key Brand Colors */
+    --primary: #ff4d6d;      /* Vibrant Pink/Red */
+    --primary-dark: #d90429; /* Deep Red for text/active states */
+    --secondary: #ffccd5;    /* Soft Pink for borders/backgrounds */
+    --accent: #fff0f3;       /* Very light pink for page background */
+    
+    /* 2. Text Colors */
+    --text-color: #590d22;   /* Dark wine color (easier to read than black) */
+    --text-light: #a4133c;   /* Lighter red for subtitles */
+
+    /* 3. Background Gradient Objects */
+    /* These control the floating blobs in the background */
+    --sphere-1: #ffb3c1;
+    --sphere-2: #ff8fa3;
+}
+
+/* APPLYING THE VARIABLES */
+
+body[data-theme="passion-red"] {
+    background-color: var(--accent);
+    color: var(--text-color);
+}
+
+/* Customize the Background Spheres */
+body[data-theme="passion-red"] #background-layer .gradient-sphere.one {
+    background: radial-gradient(circle, var(--sphere-1), transparent 70%);
+}
+
+body[data-theme="passion-red"] #background-layer .gradient-sphere.two {
+    background: radial-gradient(circle, var(--sphere-2), transparent 70%);
+}
+
+/* Customize Buttons */
+body[data-theme="passion-red"] .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+}
+
+body[data-theme="passion-red"] .btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(217, 4, 41, 0.5);
+}
+
+/* Customize Links */
+body[data-theme="passion-red"] a {
+    color: var(--primary-dark);
+}
+
+/* Customize Inputs (Focus State) */
+body[data-theme="passion-red"] input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1);
+}
