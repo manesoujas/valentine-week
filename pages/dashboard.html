@@ -513,10 +513,10 @@
         // 6. DATE LOCKING
         const todayStr = new Date().toISOString().split('T')[0];
         const locks = [
-            // {id:'sec-rose', date:'2026-02-07'}, {id:'sec-propose', date:'2026-02-08'},
-            // {id:'sec-choco', date:'2026-02-09'}, {id:'sec-teddy', date:'2026-02-10'},
-            // {id:'sec-promise', date:'2026-02-11'}, {id:'sec-hug', date:'2026-02-12'},
-            // {id:'sec-kiss', date:'2026-02-13'}, {id:'sec-val', date:'2026-02-14'}
+            {id:'sec-rose', date:'2026-02-07'}, {id:'sec-propose', date:'2026-02-08'},
+            {id:'sec-choco', date:'2026-02-09'}, {id:'sec-teddy', date:'2026-02-10'},
+            {id:'sec-promise', date:'2026-02-11'}, {id:'sec-hug', date:'2026-02-12'},
+            {id:'sec-kiss', date:'2026-02-13'}, {id:'sec-val', date:'2026-02-14'}
         ];
         locks.forEach(l => {
             if(todayStr < l.date) {
