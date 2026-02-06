@@ -511,27 +511,49 @@
         });
 
         // 6. DATE LOCKING
-        const todayStr = new Date().toISOString().split('T')[0];
-        const locks = [
-            {id:'sec-rose', date:'2026-02-07'}, {id:'sec-propose', date:'2026-02-08'},
-            {id:'sec-choco', date:'2026-02-09'}, {id:'sec-teddy', date:'2026-02-10'},
-            {id:'sec-promise', date:'2026-02-11'}, {id:'sec-hug', date:'2026-02-12'},
-            {id:'sec-kiss', date:'2026-02-13'}, {id:'sec-val', date:'2026-02-14'}
-        ];
-        locks.forEach(l => {
-            if(todayStr < l.date) {
-                const el = document.getElementById(l.id);
-                if(el) {
-                    el.classList.add('locked-section');
-                    // Change button text
-                    const btn = el.querySelector('.magic-btn');
-                    if(btn) {
-                        btn.innerText = "Locked";
-                        btn.href = "javascript:void(0)";
-                    }
-                }
+  // Use .toLocaleDateString to get the date based on your local time zone
+const today = new Date();
+const offset = today.getTimezoneOffset();
+const localDate = new Date(today.getTime() - (offset*60*1000));
+const todayStr = localDate.toISOString().split('T')[0];
+
+const locks = [
+    {id:'sec-rose', date:'2026-02-07'}, {id:'sec-propose', date:'2026-02-08'},
+    {id:'sec-choco', date:'2026-02-09'}, {id:'sec-teddy', date:'2026-02-10'},
+    {id:'sec-promise', date:'2026-02-11'}, {id:'sec-hug', date:'2026-02-12'},
+    {id:'sec-kiss', date:'2026-02-13'}, {id:'sec-val', date:'2026-02-14'}
+];
+
+locks.forEach(l => {
+    // This will now unlock Rose Day because todayStr is no longer LESS THAN l.date
+    if(todayStr < l.date) {
+        const el = document.getElementById(l.id);
+        if(el) {
+            el.classList.add('locked-section');
+            const btn = el.querySelector('.magic-btn');
+            if(btn) {
+                btn.innerText = "Locked";
+                btn.href = "./pages/coming_soon.html";
             }
-        });
+        }
+    } else {
+        // Explicitly ensure the section is UNLOCKED if the date has passed or is today
+        const el = document.getElementById(l.id);
+        if(el) {
+            el.classList.remove('locked-section');
+            el.style.filter = "none";
+            el.style.opacity = "1";
+            
+            const btn = el.querySelector('.magic-btn');
+            if(btn) {
+                // Restore the original link (e.g., rose_day.html)
+                const originalPage = l.id.replace('sec-', '') + '.html';
+                btn.href = originalPage;
+                btn.innerText = "Open " + l.id.replace('sec-', '').charAt(0).toUpperCase() + l.id.replace('sec-', '').slice(1);
+            }
+        }
+    }
+});
 
         // 7. SEND LOVE BUTTON
         const sendBtn = document.getElementById('send-love-trigger');
