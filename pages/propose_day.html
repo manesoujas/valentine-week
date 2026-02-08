@@ -3,259 +3,484 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brewing Love</title>
+    <title>Our Love Story</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@300;700&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            /* THEME: Pink Potion */
-            --bg: #ffeef2;
-            --liquid-light: #ff5c8d;
-            --liquid-dark: #ff005c;
-            --glass-shine: rgba(255, 255, 255, 0.6);
-            --cork: #e09f3e;
-            
-            /* RESPONSIVE SIZE */
-            --flask-width: 35vmin;
-            --flask-height: 45vmin;
+            --bg-day-top: #ffdde1;
+            --bg-day-bot: #ee9ca7;
+            --bg-night-top: #0f2027;
+            --bg-night-mid: #203a43;
+            --bg-night-bot: #2c5364;
+            --primary: #ff005c;
+            --gold: #ffd700;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: radial-gradient(circle at center, #fff0f5 0%, #ffc2d1 100%);
-            height: 100vh;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            background: linear-gradient(to bottom, var(--bg-day-top), var(--bg-day-bot));
+            height: 100vh; width: 100vw; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             font-family: 'Nunito', sans-serif;
-            overflow: hidden;
+            user-select: none;
+            touch-action: none; /* Disables zooming/scrolling */
+            transition: background 3s ease;
         }
 
-        /* --- HEADER --- */
-        .header {
-            position: absolute; top: 10%; text-align: center;
-            color: var(--liquid-dark);
-            z-index: 10;
+        body.night-mode {
+            background: linear-gradient(to bottom, var(--bg-night-top), var(--bg-night-bot));
         }
-        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 8vmin; margin-bottom: 5px; }
-        .header p { letter-spacing: 2px; font-size: 3vmin; opacity: 0.7; text-transform: uppercase; }
 
-        /* --- THE POTION BOTTLE --- */
-        .bottle-container {
-            position: relative;
-            width: var(--flask-width); height: var(--flask-height);
-            margin-top: 5vmin;
-            cursor: pointer;
-            filter: drop-shadow(0 20px 30px rgba(255, 0, 92, 0.2));
-            transition: transform 0.2s;
+        /* --- BACKGROUND --- */
+        .sun {
+            position: absolute; top: 10%; right: 10%;
+            width: 60px; height: 60px; background: white;
+            border-radius: 50%; opacity: 0.9;
+            box-shadow: 0 0 40px rgba(255,255,255,0.8);
+            transition: 3s;
         }
-        .bottle-container:active { transform: scale(0.95); }
+        body.night-mode .sun {
+            top: 5%; right: 5%; width: 50px; height: 50px;
+            box-shadow: 0 0 15px white; opacity: 1; 
+        }
 
-        /* Glass Shape (Round Bottom Flask) */
-        .glass {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: var(--flask-width); height: var(--flask-width);
-            background: rgba(255,255,255,0.2);
+        .stars {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; opacity: 0; transition: 3s;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        body.night-mode .stars { opacity: 0.8; }
+
+        /* --- CANVAS --- */
+        #treeCanvas {
+            position: absolute; bottom: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
+        }
+
+        /* --- START UI --- */
+        .ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding-bottom: 20%; pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .seed-btn {
+            pointer-events: auto;
+            width: 90px; height: 90px; /* Larger tap target */
+            background: radial-gradient(circle, #ff5c8d, #ff005c);
             border: 4px solid white; border-radius: 50%;
-            overflow: hidden;
-            z-index: 2;
-            box-shadow: inset 10px 10px 20px rgba(255,255,255,0.5), inset -10px -10px 20px rgba(0,0,0,0.05);
+            color: white; font-size: 2.5rem; cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 0, 92, 0.6);
+            display: flex; justify-content: center; align-items: center;
+            animation: bounce 2s infinite;
         }
         
-        /* The Neck */
-        .neck {
-            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: calc(var(--flask-width) / 2.5); height: calc(var(--flask-height) - var(--flask-width) + 10px);
-            background: rgba(255,255,255,0.2);
-            border: 4px solid white; border-bottom: none;
-            border-radius: 10px 10px 0 0;
-            z-index: 1;
+        .hint-text {
+            color: #5d4037; font-weight: bold; font-size: 1.1rem; margin-bottom: 20px;
+            text-transform: uppercase; letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.8);
+            text-align: center;
         }
+        body.night-mode .hint-text { color: white; }
+
+        /* --- PROPOSAL CARD (Responsive) --- */
+        .proposal-card {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            padding: 30px 20px; border-radius: 20px; text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            opacity: 0; pointer-events: none;
+            transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 85%; max-width: 380px; z-index: 20;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .proposal-card.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+
+        .ring-wrapper {
+            font-size: 4rem; color: var(--gold); margin-bottom: 10px;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+            animation: float 3s infinite ease-in-out;
+        }
+
+        .main-text {
+            font-family: 'Dancing Script'; font-size: 2.8rem; color: white;
+            text-shadow: 0 0 10px #ff005c; line-height: 1.1; margin-bottom: 10px;
+        }
+        .sub-text { color: #f0f0f0; font-size: 1rem; margin-bottom: 25px; }
+
+        .btn-group { display: flex; gap: 15px; justify-content: center; }
+        .btn { padding: 12px 30px; border-radius: 50px; border: none; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .btn-yes { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-no { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); }
+
+        /* --- SLIDESHOW OVERLAY --- */
+        .journey-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #2b1018 0%, #000 100%);
+            z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 1s;
+        }
+        .journey-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .polaroid-container { position: relative; width: 85%; max-width: 320px; aspect-ratio: 3/4; }
+        .polaroid {
+            background: white; padding: 10px 10px 50px 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transform: rotate(-2deg); transition: 0.5s; border-radius: 4px;
+            width: 100%;
+        }
+        .polaroid img { width: 100%; height: auto; aspect-ratio: 1/1; object-fit: cover; background: #ddd; }
         
-        /* The Cork */
-        .cork {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: calc(var(--flask-width) / 2.8); height: 25px;
-            background: var(--cork); border-radius: 5px;
-            border-bottom: 3px solid rgba(0,0,0,0.1);
-            z-index: 0;
-            transition: transform 0.1s;
+        .typewriter-area {
+            font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #333;
+            margin-top: 15px; min-height: 50px; font-style: italic; line-height: 1.4;
         }
 
-        /* LIQUID ANIMATION */
-        .liquid {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 70%;
-            background: linear-gradient(to bottom, var(--liquid-light), var(--liquid-dark));
-            border-radius: 50%;
-            transform-origin: bottom center;
-            animation: breatheLiquid 4s ease-in-out infinite;
+        .next-btn {
+            margin-top: 25px; padding: 15px 40px; background: transparent; 
+            border: 2px solid var(--primary); color: var(--primary);
+            border-radius: 50px; font-size: 1.1rem; cursor: pointer;
+            transition: 0.3s; font-family: 'Nunito'; text-transform: uppercase; letter-spacing: 1px;
         }
-        /* Wave Surface */
-        .liquid::before {
-            content: ''; position: absolute; top: -10px; left: -50%; width: 200%; height: 20px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            animation: wave 3s linear infinite;
-        }
-        @keyframes wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes breatheLiquid { 0%, 100% { height: 65%; } 50% { height: 70%; } }
+        .next-btn:active { background: var(--primary); color: white; }
 
-        /* BUBBLES */
-        .bubble {
-            position: absolute; bottom: 0; left: 50%;
-            width: 10px; height: 10px; background: rgba(255,255,255,0.6);
-            border-radius: 50%;
-            animation: rise 4s infinite ease-in;
-            opacity: 0;
-        }
-        @keyframes rise {
-            0% { bottom: 20px; opacity: 0; transform: translateX(0); }
-            50% { opacity: 1; }
-            100% { bottom: 100%; opacity: 0; transform: translateX(20px); }
-        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* --- LABEL --- */
-        .label {
-            position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%) rotate(-5deg);
-            background: #fff; padding: 10px 20px;
-            border: 2px solid var(--cork); border-radius: 5px;
-            text-align: center; z-index: 10;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            font-family: 'Fredoka', sans-serif;
+        /* Mobile specific adjustments */
+        @media (max-height: 700px) {
+            .proposal-card { padding: 20px; }
+            .main-text { font-size: 2.2rem; }
+            .ring-wrapper { font-size: 3rem; }
+            .ui-layer { padding-bottom: 10%; }
         }
-        .label span { display: block; font-size: 0.7rem; color: #888; margin-top: 2px; }
-        .label strong { color: var(--liquid-dark); font-size: 1.2rem; }
-
-        /* --- ANIMATIONS (Interaction) --- */
-        .shake { animation: shakeBottle 0.5s ease-in-out; }
-        @keyframes shakeBottle {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(10deg); }
-            75% { transform: rotate(-10deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        .pop-cork { animation: popCork 0.4s ease-out; }
-        @keyframes popCork {
-            0% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-20px); }
-            100% { transform: translateX(-50%) translateY(0); }
-        }
-
-        /* --- BOTTOM UI --- */
-        .ui-container {
-            position: absolute; bottom: 8%; width: 100%; text-align: center;
-        }
-        .status-pill {
-            display: inline-block; background: white; padding: 10px 25px;
-            border-radius: 50px; color: var(--liquid-dark); font-weight: bold;
-            box-shadow: 0 5px 20px rgba(255, 0, 92, 0.15);
-            margin-bottom: 20px; opacity: 0; transform: translateY(10px);
-            transition: 0.3s;
-        }
-        .status-pill.show { opacity: 1; transform: translateY(0); }
-
-        .back-link {
-            display: inline-block; color: var(--liquid-dark); text-decoration: none;
-            border: 2px solid var(--liquid-dark); padding: 10px 30px; border-radius: 50px;
-            font-weight: bold; transition: 0.3s;
-        }
-        .back-link:hover { background: var(--liquid-dark); color: white; }
-
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Love Potion</h1>
-        <p>BREWING IN PROGRESS...</p>
+    <div class="stars"></div>
+    <div class="sun"></div>
+    <canvas id="treeCanvas"></canvas>
+
+    <div class="ui-layer" id="startUI">
+        <div class="hint-text" id="hint">Tap to Begin<br>Our Story</div>
+        <button class="seed-btn" id="plantBtn"><i class="fas fa-heart"></i></button>
     </div>
 
-    <div class="bottle-container" id="bottle">
-        <div class="cork" id="cork"></div>
-        
-        <div class="neck"></div>
-        
-        <div class="glass">
-            <div class="liquid"></div>
-            <div id="bubble-layer"></div>
-        </div>
-
-        <div class="label">
-            <strong>Opening Soon</strong>
-            <span>DO NOT OPEN RIGHT NOW !</span>
+    <div class="proposal-card" id="proposal">
+        <div class="ring-wrapper"><i class="fas fa-ring"></i></div>
+        <div class="main-text">Will You Marry Me?</div>
+        <div class="sub-text">You are my sun, my moon, and all my stars.</div>
+        <div class="btn-group">
+            <button class="btn btn-yes" id="yesBtn">YES, Forever ❤️</button>
+            <div style="position:relative; width:80px; height:40px;">
+                <button class="btn btn-no" id="noBtn" style="top:0; left:0;">No</button>
+            </div>
         </div>
     </div>
 
-    <div class="ui-container">
-        <div class="status-pill" id="status">Still Brewing! Wait! 🧪</div>
-        <br>
-        <a href="dashboard.html" class="back-link">Return to Timeline</a>
+    <div class="journey-overlay" id="journey">
+        <div class="polaroid-container">
+            <div class="polaroid" id="polaroidCard">
+                <img src="" id="memoryImg" alt="Memory">
+                <div class="typewriter-area" id="typewriter"></div>
+            </div>
+        </div>
+        <button class="next-btn" id="nextSlideBtn">Continue</button>
     </div>
 
     <script>
-        const bottle = document.getElementById('bottle');
-        const cork = document.getElementById('cork');
-        const status = document.getElementById('status');
-        const bubbleLayer = document.getElementById('bubble-layer');
-
-        // 1. GENERATE BUBBLES
-        function createBubble() {
-            const b = document.createElement('div');
-            b.classList.add('bubble');
-            b.style.left = Math.random() * 80 + 10 + '%';
-            b.style.animationDuration = Math.random() * 2 + 2 + 's';
-            b.style.width = Math.random() * 10 + 5 + 'px';
-            b.style.height = b.style.width;
-            bubbleLayer.appendChild(b);
-            
-            // Cleanup
-            setTimeout(() => b.remove(), 4000);
-        }
-        setInterval(createBubble, 500);
-
-        // 2. INTERACTION
-        const msgs = [
-            "Still Brewing! 🧪",
-            "Ingredients Mixing... 🥣",
-            "Not Potent Yet! ⚡",
-            "Wait for the Date! 📅",
-            "Magic takes time! ✨"
+        // --- 1. CONFIGURATION ---
+        const memories = [
+            { img: "https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&fit=crop&w=400", text: "I promise to be your strength when you are weak." },
+            { img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400", text: "I promise to make you laugh every single day." },
+            { img: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=400", text: "I promise to choose you, always." },
+            { img: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=400", text: "My heart is yours. Forever." }
         ];
 
-        bottle.addEventListener('click', () => {
-            // A. Shake Bottle
-            bottle.classList.remove('shake');
-            void bottle.offsetWidth;
-            bottle.classList.add('shake');
+        // DETECT MOBILE
+        const isMobile = window.innerWidth < 768;
+        
+        // PERFORMANCE SETTINGS
+        const cfg = {
+            depth: isMobile ? 3 : 4, // Reduce recursion on mobile
+            maxBlooms: isMobile ? 3 : 5, // Fewer flowers per cluster
+            petalLife: isMobile ? 150 : 300, // Shorter petal life
+            treeWidth: isMobile ? 15 : 22
+        };
 
-            // B. Pop Cork Animation
-            cork.classList.remove('pop-cork');
-            void cork.offsetWidth;
-            cork.classList.add('pop-cork');
+        // --- 2. TREE ENGINE ---
+        const canvas = document.getElementById('treeCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let branches = [];
+        let blooms = [];
+        let petals = [];
 
-            // C. Show Status
-            status.innerText = msgs[Math.floor(Math.random() * msgs.length)];
-            status.classList.add('show');
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-            // D. Bubble Explosion (Confetti)
-            confetti({
-                particleCount: 40,
-                spread: 50,
-                origin: { y: 0.6 },
-                colors: ['#ff5c8d', '#ffffff'],
-                shapes: ['circle'],
-                gravity: 0.5,
-                scalar: 0.8
+        // START SEQUENCE
+        document.getElementById('plantBtn').addEventListener('click', () => {
+            document.body.classList.add('night-mode');
+            document.getElementById('startUI').style.opacity = '0';
+            setTimeout(() => document.getElementById('startUI').style.display = 'none', 500);
+            startGrowth();
+        });
+
+        function startGrowth() {
+            branches.push({
+                x: width/2, y: height, angle: -Math.PI/2,
+                length: 10, maxLength: height/3.5, width: cfg.treeWidth,
+                color: '#3e2723', growthRate: isMobile ? 4 : 3.5, generation: 0, finished: false
+            });
+            loop();
+        }
+
+        // --- 3. ANIMATION LOOP ---
+        function loop() {
+            let active = false;
+            
+            // Branch Logic
+            branches.forEach(b => {
+                if(b.finished) return;
+                active = true;
+
+                ctx.beginPath();
+                ctx.moveTo(b.x, b.y);
+                const endX = b.x + Math.cos(b.angle) * b.growthRate;
+                const endY = b.y + Math.sin(b.angle) * b.growthRate;
+                
+                ctx.strokeStyle = b.color;
+                ctx.lineWidth = b.width;
+                ctx.lineCap = "round";
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                b.x = endX; b.y = endY; b.length += b.growthRate;
+
+                if(b.length >= b.maxLength) {
+                    b.finished = true;
+                    if(b.generation < cfg.depth) {
+                        const splits = 2;
+                        for(let i=0; i<splits; i++) {
+                            branches.push({
+                                x: b.x, y: b.y,
+                                angle: b.angle + (Math.random()-0.5) * 1.5,
+                                length: 0, maxLength: b.maxLength * 0.75,
+                                width: b.width * 0.7, color: b.color,
+                                growthRate: 3, generation: b.generation + 1, finished: false
+                            });
+                        }
+                    } else {
+                        initBlooms(b.x, b.y);
+                    }
+                }
             });
 
-            // Reset UI
+            // Bloom Logic
+            blooms.forEach(flower => {
+                if(flower.scale < 1) {
+                    flower.scale += 0.03; // Faster blooming
+                    active = true;
+                }
+                drawRealisticFlower(flower);
+            });
+
+            // Petal Logic
+            if(petals.length > 0) {
+                updateFallingPetals();
+                active = true;
+            }
+
+            if(active) requestAnimationFrame(loop);
+            
+            if(!active && !document.getElementById('proposal').classList.contains('active')) {
+                setTimeout(showProposal, 500);
+            }
+        }
+
+        function initBlooms(x, y) {
+            const count = 2 + Math.floor(Math.random() * cfg.maxBlooms);
+            for(let i=0; i<count; i++) {
+                blooms.push({
+                    x: x + (Math.random()-0.5)*30,
+                    y: y + (Math.random()-0.5)*30,
+                    size: 3 + Math.random()*4,
+                    color: Math.random()>0.6 ? '#ffb7c5' : '#ff005c',
+                    scale: 0,
+                    rotation: Math.random() * Math.PI * 2,
+                    swayOffset: Math.random() * 100
+                });
+            }
+        }
+
+        function drawRealisticFlower(f) {
+            const currentSize = f.size * f.scale;
+            if(currentSize <= 0) return;
+
+            // Simplified Sway for Mobile
+            const sway = Math.sin((Date.now() / 1000) + f.swayOffset) * 0.1;
+
+            ctx.save();
+            ctx.translate(f.x, f.y);
+            ctx.rotate(f.rotation + sway);
+
+            // Draw Petals (No ShadowBlur for Performance)
+            ctx.fillStyle = f.color;
+            for(let i=0; i<5; i++) {
+                ctx.rotate((Math.PI * 2) / 5);
+                ctx.beginPath();
+                ctx.ellipse(0, -currentSize, currentSize/2, currentSize, 0, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // Center
+            ctx.fillStyle = "#ffd700";
+            ctx.beginPath();
+            ctx.arc(0, 0, currentSize * 0.3, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // Reduced spawn rate for falling petals
+            if(f.scale >= 1 && Math.random() < 0.0005) {
+                spawnPetal(f.x, f.y, f.color);
+            }
+        }
+
+        function spawnPetal(x, y, color) {
+            petals.push({
+                x: x, y: y,
+                vx: (Math.random()-0.5), vy: Math.random() + 0.5,
+                rotation: Math.random() * Math.PI,
+                color: color, life: cfg.petalLife
+            });
+        }
+
+        function updateFallingPetals() {
+            for(let i=petals.length-1; i>=0; i--) {
+                let p = petals[i];
+                p.x += p.vx; 
+                p.y += p.vy;
+                p.rotation += 0.05;
+                p.life--;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.fillStyle = p.color;
+                // Avoid globalAlpha changes on mobile if possible, but kept for fade out
+                if(p.life < 20) ctx.globalAlpha = p.life / 20;
+                
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 2, 4, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.restore();
+                ctx.globalAlpha = 1;
+
+                if(p.life <= 0 || p.y > height) petals.splice(i, 1);
+            }
+        }
+
+        // --- UI LOGIC ---
+        function showProposal() {
+            if(document.getElementById('proposal').classList.contains('active')) return;
+            document.getElementById('proposal').classList.add('active');
+            confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 }, colors: ['#ffd700', '#ff005c'] });
+        }
+
+        // SMART NO BUTTON (Mobile & Desktop)
+        const noBtn = document.getElementById('noBtn');
+        const moveNo = () => {
+            // Screen boundaries
+            const maxX = window.innerWidth - 80;
+            const maxY = window.innerHeight - 50;
+            
+            const x = Math.random() * (maxX - 20) + 10;
+            const y = Math.random() * (maxY - 20) + 10;
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        };
+        noBtn.addEventListener('mouseover', moveNo);
+        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); });
+
+        // YES BUTTON & SLIDESHOW
+        const yesBtn = document.getElementById('yesBtn');
+        const journey = document.getElementById('journey');
+        const imgEl = document.getElementById('memoryImg');
+        const typeEl = document.getElementById('typewriter');
+        const nextBtn = document.getElementById('nextSlideBtn');
+        const polaroid = document.getElementById('polaroidCard');
+        let slideIndex = 0;
+        let typeInterval;
+
+        yesBtn.addEventListener('click', () => {
+            document.getElementById('proposal').style.opacity = '0';
+            journey.classList.add('active');
+            loadSlide(0);
+        });
+
+        function loadSlide(index) {
+            polaroid.style.transform = "rotate(5deg) scale(0.9)";
+            polaroid.style.opacity = "0";
             setTimeout(() => {
-                status.classList.remove('show');
-            }, 1500);
+                imgEl.src = memories[index].img;
+                typeEl.innerHTML = "";
+                polaroid.style.transform = "rotate(-2deg) scale(1)";
+                polaroid.style.opacity = "1";
+                
+                let charIndex = 0;
+                const text = memories[index].text;
+                clearInterval(typeInterval);
+                typeInterval = setInterval(() => {
+                    if(charIndex < text.length) { typeEl.innerHTML += text.charAt(charIndex); charIndex++; }
+                    else clearInterval(typeInterval);
+                }, 40);
+
+                if (index === memories.length - 1) {
+                    nextBtn.innerText = "Seal with a Kiss 💋";
+                } else {
+                    nextBtn.innerText = "Next Promise ❤️";
+                }
+            }, 400);
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (slideIndex < memories.length - 1) {
+                slideIndex++; loadSlide(slideIndex);
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+            } else {
+                for(let i=0; i<20; i++) {
+                    setTimeout(() => {
+                        const el = document.createElement('div'); el.innerHTML = "💋"; 
+                        el.style.position = "fixed"; el.style.fontSize = (Math.random()*2+2)+"rem"; 
+                        el.style.left = Math.random()*100+"vw"; el.style.top = "110vh"; 
+                        el.style.transition = "2s"; el.style.zIndex="200";
+                        document.body.appendChild(el);
+                        setTimeout(() => el.style.transform = `translateY(-120vh) rotate(${Math.random()*360}deg)`, 50);
+                    }, i*100);
+                }
+                setTimeout(() => window.location.href="dashboard.html", 3000);
+            }
         });
 
     </script>
