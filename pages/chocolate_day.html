@@ -3,261 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brewing Love</title>
+    <title>Silk Love</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;600;900&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            /* THEME: Pink Potion */
-            --bg: #ffeef2;
-            --liquid-light: #ff5c8d;
-            --liquid-dark: #ff005c;
-            --glass-shine: rgba(255, 255, 255, 0.6);
-            --cork: #e09f3e;
-            
-            /* RESPONSIVE SIZE */
-            --flask-width: 35vmin;
-            --flask-height: 45vmin;
+            --silk-dark: #1a0524;
+            --silk-purple: #3e0a5e;
+            --gold: #ffd700;
+            --gold-shimmer: #fff5cc;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background: radial-gradient(circle at center, #fff0f5 0%, #ffc2d1 100%);
-            height: 100vh;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            font-family: 'Nunito', sans-serif;
-            overflow: hidden;
+            height: 100vh; width: 100vw; overflow: hidden;
+            background: #0d0212;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            perspective: 1200px;
         }
 
-        /* --- HEADER --- */
-        .header {
-            position: absolute; top: 10%; text-align: center;
-            color: var(--liquid-dark);
-            z-index: 10;
+        /* --- 1. BACKGROUND EFFECTS --- */
+        /* Liquid Waves */
+        .liquid-bg {
+            position: absolute; width: 200%; height: 200%;
+            background: radial-gradient(circle, #4a148c 0%, transparent 60%);
+            opacity: 0.3; animation: flow 15s infinite linear;
+            z-index: 0; pointer-events: none;
         }
-        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 8vmin; margin-bottom: 5px; }
-        .header p { letter-spacing: 2px; font-size: 3vmin; opacity: 0.7; text-transform: uppercase; }
+        @keyframes flow { 0% { transform: rotate(0deg) translate(0,0); } 50% { transform: rotate(180deg) translate(-50px, 50px); } 100% { transform: rotate(360deg) translate(0,0); } }
 
-        /* --- THE POTION BOTTLE --- */
-        .bottle-container {
-            position: relative;
-            width: var(--flask-width); height: var(--flask-height);
-            margin-top: 5vmin;
-            cursor: pointer;
-            filter: drop-shadow(0 20px 30px rgba(255, 0, 92, 0.2));
-            transition: transform 0.2s;
+        /* Gold Dust Canvas */
+        #dustCanvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2;
         }
-        .bottle-container:active { transform: scale(0.95); }
 
-        /* Glass Shape (Round Bottom Flask) */
-        .glass {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: var(--flask-width); height: var(--flask-width);
-            background: rgba(255,255,255,0.2);
-            border: 4px solid white; border-radius: 50%;
-            overflow: hidden;
-            z-index: 2;
-            box-shadow: inset 10px 10px 20px rgba(255,255,255,0.5), inset -10px -10px 20px rgba(0,0,0,0.05);
+        /* Floating Words */
+        .bg-words {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: space-around;
+            padding: 50px; opacity: 0; transition: opacity 1s 0.5s;
+        }
+        .bg-words.visible { opacity: 0.1; }
+
+        .word {
+            font-family: 'Cinzel', serif; font-size: 15vw; color: transparent;
+            -webkit-text-stroke: 1px var(--gold); text-transform: uppercase;
+            white-space: nowrap; animation: floatText 10s infinite ease-in-out;
+        }
+        .word:nth-child(2) { text-align: right; animation-delay: -5s; }
+
+        /* --- 2. THE CURTAINS --- */
+        .curtain-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 20; pointer-events: none;
         }
         
-        /* The Neck */
-        .neck {
+        .curtain {
+            position: absolute; top: 0; width: 50%; height: 100%;
+            /* Satin Fabric Effect */
+            background: linear-gradient(90deg, 
+                #1a0524 0%, #3e0a5e 20%, #1a0524 40%, 
+                #4a148c 50%, #1a0524 60%, #3e0a5e 80%, #1a0524 100%);
+            box-shadow: 0 0 50px black;
+            transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .curtain-l { left: 0; border-right: 2px solid rgba(0,0,0,0.5); }
+        .curtain-r { right: 0; border-left: 2px solid rgba(0,0,0,0.5); }
+
+        /* --- 3. THE GOLDEN ZIP --- */
+        .slider-track {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: calc(var(--flask-width) / 2.5); height: calc(var(--flask-height) - var(--flask-width) + 10px);
-            background: rgba(255,255,255,0.2);
-            border: 4px solid white; border-bottom: none;
-            border-radius: 10px 10px 0 0;
-            z-index: 1;
+            width: 80px; height: 100%; z-index: 30; pointer-events: auto;
         }
         
-        /* The Cork */
-        .cork {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: calc(var(--flask-width) / 2.8); height: 25px;
-            background: var(--cork); border-radius: 5px;
-            border-bottom: 3px solid rgba(0,0,0,0.1);
-            z-index: 0;
-            transition: transform 0.1s;
+        .ribbon-line {
+            width: 6px; height: 100%; 
+            background: linear-gradient(to right, #b8860b, #ffd700, #b8860b);
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            box-shadow: 0 0 20px var(--gold);
         }
 
-        /* LIQUID ANIMATION */
-        .liquid {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 70%;
-            background: linear-gradient(to bottom, var(--liquid-light), var(--liquid-dark));
-            border-radius: 50%;
-            transform-origin: bottom center;
-            animation: breatheLiquid 4s ease-in-out infinite;
+        .knot {
+            width: 90px; height: 90px; 
+            background: radial-gradient(circle at 30% 30%, #fff5cc, #ffd700, #b8860b);
+            border-radius: 50%; border: 2px solid white;
+            position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+            cursor: grab; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
+            animation: pulseKnot 2s infinite; z-index: 2;
         }
-        /* Wave Surface */
-        .liquid::before {
-            content: ''; position: absolute; top: -10px; left: -50%; width: 200%; height: 20px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            animation: wave 3s linear infinite;
-        }
-        @keyframes wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes breatheLiquid { 0%, 100% { height: 65%; } 50% { height: 70%; } }
+        .knot i { color: #3e0a5e; font-size: 2rem; filter: drop-shadow(0 2px 0 rgba(255,255,255,0.5)); }
+        .knot:active { cursor: grabbing; transform: translateX(-50%) scale(1.1); }
 
-        /* BUBBLES */
-        .bubble {
-            position: absolute; bottom: 0; left: 50%;
-            width: 10px; height: 10px; background: rgba(255,255,255,0.6);
-            border-radius: 50%;
-            animation: rise 4s infinite ease-in;
-            opacity: 0;
-        }
-        @keyframes rise {
-            0% { bottom: 20px; opacity: 0; transform: translateX(0); }
-            50% { opacity: 1; }
-            100% { bottom: 100%; opacity: 0; transform: translateX(20px); }
+        .hint-arrow {
+            position: absolute; top: 28%; left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.7); font-size: 0.8rem; letter-spacing: 2px;
+            text-transform: uppercase; text-shadow: 0 2px 10px black;
+            pointer-events: none; transition: 0.3s; width: 100%; text-align: center;
         }
 
-        /* --- LABEL --- */
-        .label {
-            position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%) rotate(-5deg);
-            background: #fff; padding: 10px 20px;
-            border: 2px solid var(--cork); border-radius: 5px;
-            text-align: center; z-index: 10;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            font-family: 'Fredoka', sans-serif;
+        /* --- 4. THE CARD (FLIPPER) --- */
+        .stage-layer {
+            position: absolute; width: 320px; height: 480px; z-index: 5;
+            opacity: 0; transform: scale(0.8);
+            transition: opacity 1s, transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .label span { display: block; font-size: 0.7rem; color: #888; margin-top: 2px; }
-        .label strong { color: var(--liquid-dark); font-size: 1.2rem; }
+        .stage-layer.visible { opacity: 1; transform: scale(1); }
 
-        /* --- ANIMATIONS (Interaction) --- */
-        .shake { animation: shakeBottle 0.5s ease-in-out; }
-        @keyframes shakeBottle {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(10deg); }
-            75% { transform: rotate(-10deg); }
-            100% { transform: rotate(0deg); }
+        .card-flipper {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .card-flipper.flipped { transform: rotateY(180deg); }
+        .card-flipper.shake { animation: crunchShake 0.4s ease-in-out; }
 
-        .pop-cork { animation: popCork 0.4s ease-out; }
-        @keyframes popCork {
-            0% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-20px); }
-            100% { transform: translateX(-50%) translateY(0); }
+        /* FRONT & BACK */
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden;
         }
 
-        /* --- BOTTOM UI --- */
-        .ui-container {
-            position: absolute; bottom: 8%; width: 100%; text-align: center;
+        /* Front */
+        .front {
+            background: linear-gradient(135deg, #2a0045, #120024);
+            border: 2px solid var(--gold); padding: 20px;
         }
-        .status-pill {
-            display: inline-block; background: white; padding: 10px 25px;
-            border-radius: 50px; color: var(--liquid-dark); font-weight: bold;
-            box-shadow: 0 5px 20px rgba(255, 0, 92, 0.15);
-            margin-bottom: 20px; opacity: 0; transform: translateY(10px);
-            transition: 0.3s;
+        
+        .photo-container {
+            width: 200px; height: 200px; border-radius: 50%;
+            border: 4px solid var(--gold); margin-bottom: 20px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            /* This allows the bite shape */
+            transition: clip-path 0.1s;
         }
-        .status-pill.show { opacity: 1; transform: translateY(0); }
+        .photo-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* The Bite Shape (Hidden initially) */
+        .photo-container.bitten {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 60% 100%, 55% 85%, 45% 88%, 35% 80%, 25% 85%, 20% 100%, 0% 100%);
+        }
 
-        .back-link {
-            display: inline-block; color: var(--liquid-dark); text-decoration: none;
-            border: 2px solid var(--liquid-dark); padding: 10px 30px; border-radius: 50px;
-            font-weight: bold; transition: 0.3s;
+        .main-title { font-family: 'Great Vibes', cursive; font-size: 3rem; color: var(--gold); margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .sub-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #ccc; margin-bottom: 30px; }
+
+        .btn-bite {
+            padding: 15px 40px; background: var(--gold); color: #2a0045;
+            border: none; border-radius: 50px; font-weight: 900; font-size: 1rem;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); transition: 0.3s;
         }
-        .back-link:hover { background: var(--liquid-dark); color: white; }
+        .btn-bite:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--gold); }
+
+        /* Back (Golden Ticket) */
+        .back {
+            transform: rotateY(180deg);
+            background: #fff8e1; color: #3e2723;
+            border: 4px dashed var(--gold);
+        }
+        .ticket-header { font-family: 'Cinzel'; font-weight: 900; font-size: 2rem; margin-bottom: 10px; border-bottom: 2px solid #3e2723; }
+        .ticket-body { font-family: 'Great Vibes'; font-size: 2rem; margin-bottom: 30px; color: #4a148c; }
+        
+        .btn-final {
+            background: #4a148c; color: var(--gold);
+            padding: 12px 30px; border: none; border-radius: 5px;
+            font-family: 'Montserrat'; font-weight: bold; text-transform: uppercase; cursor: pointer;
+        }
+
+        /* --- ANIMATIONS --- */
+        body.open .curtain-l { transform: translateX(-100%); }
+        body.open .curtain-r { transform: translateX(100%); }
+        body.open .slider-track { opacity: 0; pointer-events: none; transition: 0.5s; }
+
+        @keyframes pulseKnot { 0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(255,215,0,0.7); } 70% { transform: translateX(-50%) scale(1.1); box-shadow: 0 0 0 20px rgba(255,215,0,0); } }
+        @keyframes floatText { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes crunchShake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 50% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0deg); } }
 
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Love Potion</h1>
-        <p>BREWING IN PROGRESS...</p>
+    <div class="liquid-bg"></div>
+    <div class="liquid-bg" style="animation-direction: reverse; opacity: 0.2;"></div>
+    
+    <canvas id="dustCanvas"></canvas>
+
+    <div class="bg-words" id="bgText">
+        <div class="word">Silk</div>
+        <div class="word">Desire</div>
+        <div class="word">Love</div>
     </div>
 
-    <div class="bottle-container" id="bottle">
-        <div class="cork" id="cork"></div>
-        
-        <div class="neck"></div>
-        
-        <div class="glass">
-            <div class="liquid"></div>
-            <div id="bubble-layer"></div>
-        </div>
-
-        <div class="label">
-            <strong>Opening Soon</strong>
-            <span>DO NOT OPEN RIGHT NOW !</span>
+    <div class="stage-layer" id="stage">
+        <div class="card-flipper" id="flipper">
+            <div class="card-face front">
+                <div class="photo-container" id="photoBox">
+                    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=500" id="userPhoto" alt="Us">
+                </div>
+                <div class="main-title">Happy Chocolate Day</div>
+                <div class="sub-title">You are my favorite flavor</div>
+                <button class="btn-bite" id="biteBtn">Take a Bite</button>
+            </div>
+            <div class="card-face back">
+                <div class="ticket-header">GOLDEN TICKET</div>
+                <div class="ticket-body">"Life tastes better with you."</div>
+                <button class="btn-final" onclick="location.href='dashboard.html'">Claim Your Heart</button>
+            </div>
         </div>
     </div>
 
-    <div class="ui-container">
-        <div class="status-pill" id="status">Still Brewing! Wait! 🧪</div>
-        <br>
-        <a href="dashboard.html" class="back-link">Return to Timeline</a>
+    <div class="curtain-container">
+        <div class="curtain curtain-l"></div>
+        <div class="curtain curtain-r"></div>
+    </div>
+
+    <div class="slider-track" id="track">
+        <div class="ribbon-line"></div>
+        <div class="knot" id="knot"><i class="fas fa-chevron-down"></i></div>
+        <div class="hint-arrow" id="hint">Slide to Unwrap</div>
     </div>
 
     <script>
-        const bottle = document.getElementById('bottle');
-        const cork = document.getElementById('cork');
-        const status = document.getElementById('status');
-        const bubbleLayer = document.getElementById('bubble-layer');
+        // --- 1. SETUP & DUMMY IMAGE LOGIC ---
+        const storedImg = localStorage.getItem('userImage') || localStorage.getItem('uploadedImage');
+        const imgElement = document.getElementById('userPhoto');
 
-        // 1. GENERATE BUBBLES
-        function createBubble() {
-            const b = document.createElement('div');
-            b.classList.add('bubble');
-            b.style.left = Math.random() * 80 + 10 + '%';
-            b.style.animationDuration = Math.random() * 2 + 2 + 's';
-            b.style.width = Math.random() * 10 + 5 + 'px';
-            b.style.height = b.style.width;
-            bubbleLayer.appendChild(b);
-            
-            // Cleanup
-            setTimeout(() => b.remove(), 4000);
+        if (storedImg) {
+            imgElement.src = storedImg;
+        } else {
+            // DUMMY LOVE PICTURE (Romantic Couple Holding Hands)
+            imgElement.src = "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=500&q=80";
         }
-        setInterval(createBubble, 500);
 
-        // 2. INTERACTION
-        const msgs = [
-            "Still Brewing! 🧪",
-            "Ingredients Mixing... 🥣",
-            "Not Potent Yet! ⚡",
-            "Wait for the Date! 📅",
-            "Magic takes time! ✨"
-        ];
+        // --- 2. GOLD DUST ENGINE ---
+        const canvas = document.getElementById('dustCanvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [];
 
-        bottle.addEventListener('click', () => {
-            // A. Shake Bottle
-            bottle.classList.remove('shake');
-            void bottle.offsetWidth;
-            bottle.classList.add('shake');
+        function resize() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
+        window.addEventListener('resize', resize); resize();
 
-            // B. Pop Cork Animation
-            cork.classList.remove('pop-cork');
-            void cork.offsetWidth;
-            cork.classList.add('pop-cork');
+        class Particle {
+            constructor(x, y) {
+                this.x = x; this.y = y;
+                this.vx = (Math.random()-0.5)*2; this.vy = (Math.random()-0.5)*2;
+                this.life = 1; this.size = Math.random()*3;
+            }
+            update() { this.x+=this.vx; this.y+=this.vy; this.life-=0.02; }
+            draw() { 
+                ctx.fillStyle = `rgba(255, 215, 0, ${this.life})`; 
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); 
+            }
+        }
 
-            // C. Show Status
-            status.innerText = msgs[Math.floor(Math.random() * msgs.length)];
-            status.classList.add('show');
+        window.addEventListener('mousemove', e => particles.push(new Particle(e.clientX, e.clientY)));
+        window.addEventListener('touchmove', e => particles.push(new Particle(e.touches[0].clientX, e.touches[0].clientY)));
 
-            // D. Bubble Explosion (Confetti)
-            confetti({
-                particleCount: 40,
-                spread: 50,
-                origin: { y: 0.6 },
-                colors: ['#ff5c8d', '#ffffff'],
-                shapes: ['circle'],
-                gravity: 0.5,
-                scalar: 0.8
-            });
+        function animateDust() {
+            ctx.clearRect(0,0,w,h);
+            for(let i=particles.length-1; i>=0; i--) {
+                particles[i].update(); particles[i].draw();
+                if(particles[i].life <= 0) particles.splice(i,1);
+            }
+            requestAnimationFrame(animateDust);
+        }
+        animateDust();
 
-            // Reset UI
+        // --- 3. ZIP LOGIC ---
+        const knot = document.getElementById('knot');
+        const hint = document.getElementById('hint');
+        let isDragging = false;
+        let startY = 0;
+
+        const startDrag = (y) => { isDragging = true; startY = y; hint.style.opacity = 0; };
+        const endDrag = () => {
+            if(isDragging) {
+                isDragging = false;
+                knot.style.transition = "top 0.3s"; knot.style.top = "15%";
+                setTimeout(()=>knot.style.transition="none",300);
+                hint.style.opacity = 1;
+            }
+        };
+        const onDrag = (y) => {
+            if(!isDragging) return;
+            let newTop = 15 + ((y - startY) / window.innerHeight * 100);
+            if(newTop < 15) newTop = 15;
+            knot.style.top = newTop + '%';
+            if(newTop > 75) finishOpen();
+        };
+
+        knot.addEventListener('mousedown', e => startDrag(e.clientY));
+        window.addEventListener('mousemove', e => onDrag(e.clientY));
+        window.addEventListener('mouseup', endDrag);
+        knot.addEventListener('touchstart', e => startDrag(e.touches[0].clientY));
+        window.addEventListener('touchmove', e => onDrag(e.touches[0].clientY));
+        window.addEventListener('touchend', endDrag);
+
+        function finishOpen() {
+            isDragging = false;
+            knot.style.transition = "top 0.4s ease-in"; knot.style.top = "120%";
+            if(navigator.vibrate) navigator.vibrate(100);
             setTimeout(() => {
-                status.classList.remove('show');
-            }, 1500);
+                document.body.classList.add('open');
+                document.getElementById('stage').classList.add('visible');
+                document.getElementById('bgText').classList.add('visible');
+                confetti({ particleCount: 100, spread: 80, colors: ['#ffd700', '#fff'] });
+            }, 300);
+        }
+
+        // --- 4. BITE LOGIC ---
+        const biteBtn = document.getElementById('biteBtn');
+        const photoBox = document.getElementById('photoBox');
+        const flipper = document.getElementById('flipper');
+
+        biteBtn.addEventListener('click', () => {
+            // 1. Shake
+            flipper.classList.add('shake');
+            if(navigator.vibrate) navigator.vibrate([50, 50]);
+
+            // 2. Bite Visual (Delay slightly for impact)
+            setTimeout(() => {
+                photoBox.classList.add('bitten');
+                
+                // 3. Flip after bite
+                setTimeout(() => {
+                    flipper.classList.add('flipped');
+                    confetti({ particleCount: 200, spread: 120, colors: ['#ffd700', '#4a148c'] });
+                }, 600);
+            }, 200);
         });
 
     </script>
 </body>
 </html>
+
